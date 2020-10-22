@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/djMax/paypal-retail-node.git"
+    "url": "git+https://github.com/djMax/paypal-retail-node.git"
   },
   "keywords": [
     "paypal",
@@ -26,8 +26,12 @@
   },
   "homepage": "https://github.com/djMax/paypal-retail-node",
   "dependencies": {
-    "express": "^4.12.3",
-    "wreck": "^5.4.0"
+    "express": "^4.17.1",
+    "nodemon": "^2.0.6",
+    "to": "^0.2.9",
+    "update": "^0.7.4",
+    "util": "^0.12.3",
+    "wreck": "^5.6.1"
   },
   "devDependencies": {
     "coveralls": "^2.11.2",
@@ -37,5 +41,9 @@
     "grunt-simple-mocha": "^0.4.0",
     "istanbul": "^0.3.13",
     "mocha": "^2.2.4"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "license": "ISC"
 }
