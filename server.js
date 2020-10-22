@@ -27,7 +27,7 @@ var errors, warnings, hasLive, hasSandbox;
 validateEnvironment();
 
 if (!errors) {
-
+    
     showStartupMessage();
 }
 
@@ -129,7 +129,7 @@ function configurePayPal() {
             secret: PAYPAL_SANDBOX_SECRET,
             returnUrl: combineUrl(ROOT_URL, 'returnFromPayPal'),
             refreshUrl: combineUrl(ROOT_URL, 'refresh'),
-            scopes: "email" // This is optional, we have defaults in paypal-retail-node
+            scopes: process.env.SCOPES // This is optional, we have defaults in paypal-retail-node
         });
         checkScopes(paypal.SANDBOX);
     }
