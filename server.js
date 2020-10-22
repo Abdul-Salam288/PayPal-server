@@ -7,18 +7,18 @@ var express = require('express'),
  * These are the variables we will look for in the environment, from "most important" to least
  */
 // A random value used to provide additional control to disable compromised versions of your app
-var APP_SECURE_IDENTIFIER = "sakldjlfjwreioworjkflmslflmleikroksa";
+var APP_SECURE_IDENTIFIER = process.env.APP_SECURE_IDENTIFIER;
 var PAYPAL_LIVE_CLIENTID = process.env.PAYPAL_LIVE_CLIENTID;
 var PAYPAL_LIVE_SECRET = process.env.PAYPAL_LIVE_SECRET;
-var PAYPAL_SANDBOX_CLIENTID = "AfrZmVasby-OzdCNcpgbOANbP3jIZ-sxDXcE-s90eqRxFtvtnXXfR0BTja2kWRl5LjNDSWgKw7i0vObM";
-var PAYPAL_SANDBOX_SECRET = "EEIusyI_-o1CScoMcP4QR2sdZiqG_H1e17fTeRZ0RhWc7QX5dOg01MJw8_DoQRUPe_32lB_5CvbESv6i";
+var PAYPAL_SANDBOX_CLIENTID = process.env.PAYPAL_SANDBOX_CLIENTID;
+var PAYPAL_SANDBOX_SECRET = process.env.PAYPAL_SANDBOX_SECRET;
 // The base URL by which this server can be reached on the Internet (e.g. for token refresh)
-var ROOT_URL = "http://127.0.0.1:3000";
+var ROOT_URL = process.env.ROOT_URL;
 // For third-party use, you will want this site to redirect to your app after the login flow completes.
 // This URL will receive the access_token, refresh_url, and expires_in values as query arguments.
 // If you don't set this value, this server essentially becomes "first party use only" as all it can do
 // is refresh tokens generated with /firstParty
-var APP_REDIRECT_URL = "http://127.0.0.1:3000/returnFromPayPAl";
+var APP_REDIRECT_URL = process.env.APP_REDIRECT_URL;
 // If a PayPal representative gives you a custom environment string, set it as this env var
 var PAYPAL_CUSTOM_ENVIRONMENT = process.env.PAYPAL_CUSTOM_ENVIRONMENT;
 
@@ -134,7 +134,7 @@ function configurePayPal() {
     }
     if (PAYPAL_CUSTOM_ENVIRONMENT) {
         try {
-            var info = JSON.parse(new Buffer.alloc(PAYPAL_CUSTOM_ENVIRONMENT, 'base64').toString('utf8'));
+            var info = JSON.parse(new Buffer(PAYPAL_CUSTOM_ENVIRONMENT, 'base64').toString('utf8'));
             for (var envI = 0; envI < info.length; envI++) {
                 console.log('Configuring', info[envI].name, 'environment');
                 info[envI].returnUrl = info[envI].returnUrl || combineUrl(ROOT_URL, 'returnFromPayPal');
