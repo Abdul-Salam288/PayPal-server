@@ -148,6 +148,7 @@ module.exports = {
      * @param callback (error, tokenInfo) Called with the access token and refresh url in the tokenInfo object
      */
     completeAuthentication: function (query, app_secure_identifier, callback) {
+        console.log("authentication");
         if (!app_secure_identifier) {
             throw new Error('app_secure_identifier parameter is required to complete authentication.');
         }
@@ -157,7 +158,13 @@ module.exports = {
         if (query.error) {
             return callback(new Error(util.format('Login with PayPal Error! %s: %s', query.error, query.error_description)));
         }
+
+        console.log(query);
+
         var state = JSON.parse(query.state);
+
+        console.log(state);
+        
         if (!state || state.length < 2) {
             throw new Error('The "state" parameter is invalid when trying to complete PayPal authentication.');
         }
@@ -165,11 +172,12 @@ module.exports = {
         var returnTokenOnQueryString = state.length > 2 ? (!!state[2]) : false;
         var url = tsUrl(env);
         var cfg = configs[env];
+        console.log(url);
         wreck.post(url, {
             payload: util.format('grant_type=authorization_code&code=%s&redirect_uri=%s', encodeURIComponent(query.code), encodeURIComponent(cfg.returnUrl)),
             json: 'force',
             headers: {
-                'Authorization': 'Basic ' + new Buffer(cfg.clientId + ':' + cfg.secret).toString('base64'),
+                'Authorization': 'Basic ' + new Buffer.from(cfg.clientId + ':' + cfg.secret).toString('base64'),
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
         }, function (err, rz, payload) {
@@ -182,6 +190,7 @@ module.exports = {
                 appError.env = env;
                 return callback(appError);
             }
+
             var returnUrl = state[1] + (state[1].indexOf('?')>=0 ? '&':'?');
             if (!returnTokenOnQueryString) {
                 returnUrl += "sdk_token=";
@@ -218,7 +227,8 @@ module.exports = {
 function tsUrl(env) {
     var url = 'https://api.paypal.com/v1/identity/openidconnect/tokenservice';
     if (env == module.exports.SANDBOX) {
-        url = 'https://api.sandbox.paypal.com/v1/identity/openidconnect/tokenservice';
+        //url = 'https://api.sandbox.paypal.com/v1/identity/openidconnect/tokenservice';
+        url = 'https://api.sandbox.paypal.com/v1/oauth2/token';
     } else if (env.indexOf('stage2') === 0) {
         url = util.format('https://www.%s.stage.paypal.com:12714/v1/identity/openidconnect/tokenservice', env);
     }
@@ -239,7 +249,7 @@ function encrypt(plainText, password, cb) {
     var salt = new Buffer(crypto.randomBytes(16), 'binary');
     var iv = new Buffer(crypto.randomBytes(16), 'binary');
 
-    crypto.pbkdf2(password, salt, 1000, 32, function (err, key) {
+    crypto.pbkdf2(password, salt, 1000, 32, 'sha512', function (err, key) {
         if (err) {
             logger.error('Failed to generate key.', err);
             cb(err, null);
@@ -266,7 +276,7 @@ function decrypt(cipherText, password, cb) {
     var hmac = cipher.slice(32, 52);
     cipherText = cipher.slice(52);
 
-    crypto.pbkdf2(password, salt, 1000, 32, function (err, key) {
+    crypto.pbkdf2(password, salt, 1000, 32, 'sha512', function (err, key) {
         if (err) {
             logger.error('Failed to generate key.', err);
             cb(err, null);
